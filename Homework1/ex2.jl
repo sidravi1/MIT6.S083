@@ -29,21 +29,21 @@ data_countries_grp.variable = parse.(Date, data_countries_grp.variable, format) 
 
 # 2
 
-gby = groupby(data_countries_grp, :country);
-gby = transform(gby, :value => (x -> pushfirst!(diff(x), 0)) => :difference, ungroup=false);
-data_countries_final = transform(gby, :difference => runmean => :new7day);
-data_countries_final.value = convert.(Float32, data_countries_final.value);
-replace!(data_countries_final.value, Pair(0.0, NaN));
-data_countries_final[data_countries_final.new7day .< 1, :new7day] .= NaN;
-data_countries_final[.!isnan.(data_countries_final.new7day), :]
-
-function runmean(x) 
+function runsum(x) 
     out = zeros(length(x))
     for i in 1:length(x)
         out[i] = sum(view(x, max(1, i-7):i))
     end
     return out
 end
+
+gby = groupby(data_countries_grp, :country);
+gby = transform(gby, :value => (x -> pushfirst!(diff(x), 0)) => :difference, ungroup=false);
+data_countries_final = transform(gby, :difference => runsum => :new7day);
+data_countries_final.value = convert.(Float32, data_countries_final.value);
+replace!(data_countries_final.value, Pair(0.0, NaN));
+data_countries_final[data_countries_final.new7day .< 1, :new7day] .= NaN;
+data_countries_final[.!isnan.(data_countries_final.new7day), :]
 
 #3, 4
 
