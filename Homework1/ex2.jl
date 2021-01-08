@@ -63,7 +63,6 @@ function app(req)
         base = @df new_df plot!(base, :value, :new7day, group = :country)
         plot!(base, yaxis=:log10, xaxis=:log10)
         plot!(base, yaxis=:log10, xaxis=:log10)
-        #plot!(pl, xlim = (0, 2.5e7), ylim = (0, 2e6))
     end
 end
 webio_serve(page("/", app), 8000)
